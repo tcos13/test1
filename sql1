@@ -1,14 +1,10 @@
 WITH SeparateWords ( Product_ID, StringValue, Word, Position, RestOfLine)
 AS
 (SELECT Product_ID, product_description,
-				REGEXP_REPLACE
-				(
 				Case INSTR(Product_description, ' ')
 						 WHEN 0 THEN product_description
 						 ELSE SUBSTR(Product_Description,1, INSTR(product_description, ' ') - 1)
-				END
-				, '(\d+|[,.;:()-]+)'
-				),
+				End,
 				1
 				,
 				CASE INSTR(Product_description, ' ')
@@ -16,26 +12,20 @@ AS
 						 ELSE SUBSTR(Product_Description, INSTR(product_description, ' ') + 1,  LENGTH(Product_description))
 				END
 	 FROM oe.product_information
-  -- WHERE Product_ID = 1797
 UNION ALL
 SELECT sw.Product_ID, sw.StringValue,
-			 REGEXP_REPLACE
-			 (
 			 CASE INSTR(sw.RestOfLine, ' ')
 			 			WHEN 0 THEN sw.RestOfLine
 						ELSE SUBSTR(sw.RestOfLine,1, INSTR(sw.RestOfLine, ' ') - 1)
-			 END
-			 , '(\d+|[,.;:()-]+)'
-			 ),
+			 End,
 			 Position + 1,
 			 CASE INSTR(sw.RestOfLine, ' ')
 			 			WHEN 0 THEN ''
 						ELSE SUBSTR(sw.RestOfLine, INSTR(sw.RestOfLine, ' ') + 1, LENGTH(sw.RestOfLine))
 			 END
   FROM SeparateWords sw
--- WHERE sw.RestOfLine != ''
  WHERE INSTR(sw.RestOfLine, ' ') >= 0
 )
 SELECT Word, Position, StringValue
 FROM SeparateWords
-ORDER BY Product_ID, Pos
+ORDER BY Product_ID, Position;
